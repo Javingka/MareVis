@@ -1,5 +1,4 @@
-var data_como_string =  "  \n\
-data,hora,metros,mare,lua  \n\
+var data_como_string =  "data,hora,metros,mare,lua  \n\
 01/01/2016,02:06,0.7,1,minguante  \n\
 01/01/2016,08:36,1.8,2,minguante  \n\
 01/01/2016,14:23,0.9,3,minguante  \n\
