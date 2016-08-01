@@ -2,6 +2,14 @@ function DiasRectAxis () {
   this.rectDias = new mo.List();
 }
 
+DiasRectAxis.prototype.drawMousePosition = function() {
+  var posMouseX = Math.min(Math.max(mouseX, this.fullRect.x), this.fullRect.x+this.fullRect.width);
+
+  stroke('#aaa');
+  line(posMouseX,this.fullRect.y,posMouseX,this.fullRect.y+this.fullRect.height);
+
+}
+
 DiasRectAxis.prototype.drawColorLeyend = function () {
 
   var x = width*0.4;
@@ -19,7 +27,7 @@ DiasRectAxis.prototype.drawColorLeyend = function () {
 DiasRectAxis.prototype.DrawMetrosAxis = function () {
   var fullRect = this.fullRect;
   var range = this.maxMetros - this.mimMetros;
-  var cantLineas = 30
+  var cantLineas = 25;
   var separacao = 1/cantLineas;
   for (var i=0; i<cantLineas; i++){
     stroke('gray');
@@ -27,8 +35,10 @@ DiasRectAxis.prototype.DrawMetrosAxis = function () {
         fullRect.x+fullRect.width, fullRect.y+(fullRect.height*separacao*i));
     fill('black');
     text( (this.mimMetros + range*separacao*i).toFixed(2),
-      fullRect.x-30, fullRect.y+fullRect.height-(fullRect.height*separacao* (i+1) ) );
+      fullRect.x-30, fullRect.y+fullRect.height-(fullRect.height*separacao* (i) ) );
   }
+  text( (this.mimMetros + range*separacao*i).toFixed(2),
+    fullRect.x-30, fullRect.y+fullRect.height-(fullRect.height*separacao* (i) ) );
 };
 /* Recebe um alista de dias, e cria uma serie de rectángulos, um por cada dia
   essses rectángulos vão ficar dentro da área especificada pelo 'fullRect' */
@@ -47,7 +57,7 @@ DiasRectAxis.prototype.createGraphicalObjects = function(
   var color_by_mare = this.color_by_mare = mInfo.frequenciesTable[3]; //tabela de cores
 
   this.maxMetros = metros.getMax();
-  this.mimMetros = metros.getMin();
+  this.mimMetros = 0;
 
   var y  = fullRect.y;
   var widthByDia = fullRect.width/dias_em_linha;
@@ -78,6 +88,7 @@ DiasRectAxis.prototype.createGraphicalObjects = function(
     tempCount++;
     arrayDeHoras = new mo.NumberList();
     arrayDeCorMares = new mo.StringList();
+    arrayDeDiaHora = new mo.StringList();
     arrayDeMetros = new mo.NumberList();
 
     //loop por cada hora do dia,
@@ -93,7 +104,7 @@ DiasRectAxis.prototype.createGraphicalObjects = function(
       posicaoHoraNoDia = horasDesdeInicio/24; // númetro entre 0 e 1. Onde 0 sería as 00:00 hrs e 1 24.00 horas
       arrayDeHoras.push( posicaoHoraNoDia);
       arrayDeCorMares.push( color_by_mare[mares[ indiceParaHoras ] - 1 ] );
-
+      arrayDeDiaHora.push(dadoHora);
       //Calcula da posição vertical segundo metros
       metroHora = metros[indiceParaHoras];
       arrayDeMetros.push( metroHora / this.maxMetros );
@@ -105,6 +116,7 @@ DiasRectAxis.prototype.createGraphicalObjects = function(
     innerRect.arrayDeHoras = arrayDeHoras;
     innerRect.arrayDeCorMares = arrayDeCorMares;
     innerRect.arrayDeMetros = arrayDeMetros;
+    innerRect.arrayDeDiaHora = arrayDeDiaHora;
     this.rectDias.push(innerRect);
     if ((i+1)%dias_em_linha == 0) {
       tempCount = 0;
@@ -119,6 +131,7 @@ DiasRectAxis.prototype.drawRects = function () {
 
   var r;
   var posHora, corMare, metro;
+  var rollOver;
   for (var i=0; i<this.rectDias.length; i++) {
     r = this.rectDias[i];
     fill(r.color);
@@ -134,13 +147,18 @@ DiasRectAxis.prototype.drawRects = function () {
       metro = r.arrayDeMetros[j];
       fill(corMare);
       noStroke();
-      ellipse(r.x + (r.width*posHora), r.y+(r.height*metro), 6,6);
+      ellipse(r.x + (r.width*posHora), r.y+r.height-(r.height*metro), 6,6);
+
+      if ( Math.abs(mouseX - (r.x + (r.width*posHora) ) ) < 6 ) {
+        text(r.arrayDeDiaHora[j], r.x + (r.width*posHora), r.y+r.height-(r.height*metro));
+      }
     }
 
     //Draw Day Text
     push();
     translate( r.x +r.onLoop * 15 , r.y + r.height + 50);
     rotate(-Math.PI*0.25);
+    fill('black');
     text(r.name,0 ,0); // Text wraps within text box
     pop();
   }

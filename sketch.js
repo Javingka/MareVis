@@ -60,7 +60,7 @@ function setup() {
     colunaMetros, TMEtrosInfo,
     colunaMare,  TMareInfo,
     colunaLua, TLuaInfo,
-    1, moFundoDesenho);
+    31, moFundoDesenho);
 }
 
 function draw() {
@@ -68,6 +68,7 @@ function draw() {
   axisX.DrawMetrosAxis();
   axisX.drawRects();
   axisX.drawColorLeyend();
+  axisX.drawMousePosition();
 }
 
 /*Pinta os fundos sobre os quais vão se desenhar*/
@@ -87,13 +88,12 @@ function mousePressed() {
 
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
-
   moFundoDesenho = new mo.Rectangle(50,50, width-70, height-120); //Rectangulo de fundo do grafico
   moFundoDesenho.color = 'white';
   novoGrafico();
 }
 
-function novoGrafico() {
+function novoGrafico(_num) {
   var num = Number(input.value()) == null? 31: Number(input.value());
   num = Math.min( Math.max(1, num), 31 );
   console.log(vLog, 'num', num)
